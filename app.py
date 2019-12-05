@@ -1,9 +1,74 @@
 from flask import Flask, request, jsonify
+import uuid
+from random import choice, randrange
+from string import ascii_uppercase
+
 
 app = Flask(__name__)
 
 current_price = float(1)
 current_reservations = 0
+reservations = {}
+products = {}
+n_products = 999
+
+
+@app.route('/reserve/<customer_id>', methods=['POST', 'GET'])
+def reserve(customer_id):
+    """Summary
+    Usage: curl  http://127.0.0.1:5000/reserve/kdash -X GET
+    curl http://127.0.0.1:5000/reserve/kdash -X POST -d product_ids='123,213'
+    Args:
+        customer_id (str): 
+
+    Returns:
+        reservations: json-object
+    """
+    if request.method == 'POST':
+        product_ids = request.form.get('product_ids').split(',')
+        reservations[customer_id] = product_ids
+
+    return jsonify(reservations.get(customer_id, None))
+
+
+@app.route('/product/<product_id>', methods=['POST', 'GET'])
+def product(product_id):
+    """Summary
+    Usage: curl  http://127.0.0.1:5000/product/ -X POST -d product_id=bar -d name=foo
+    Returns:
+        TYPE: Description
+    """
+    if request.method == 'POST':
+        description = request.form.get('description', None)
+        name = request.form.get('name', None)
+        print(name)
+        price = request.form.get('price', None)
+        products[product_id] = {
+            'name': name,
+            'description': description,
+            'price': price}
+        result = products[product_id]
+    elif request.method == 'GET':
+        result = products.get(product_id, None)
+
+    return jsonify(data=result)
+
+
+@app.route('/batch/', methods=['POST'])
+def add_batch():
+
+    global n_products
+    for i in range(n_products):
+        description = ''.join(choice(ascii_uppercase) for i in range(12))
+        name = f'Bosch-{i}'
+        product_id = uuid.uuid4()
+        price = randrange(4000) + 1000
+        products[product_id] = {
+            'name': name,
+            'description': description,
+            'price': price}
+
+    return jsonify(data=0)
 
 
 @app.route('/price/', methods=['GET', 'POST'])
