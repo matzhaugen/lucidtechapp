@@ -9,8 +9,8 @@ current_reservations = 0
 @app.route('/price/', methods=['GET', 'POST'])
 def price():
     """Get and update price
-    Usage: curl -d new_price=1 http://127.0.0.1:5000/price/
-    Usage: curl http://127.0.0.1:5000/price/
+    POST: curl -d new_price=1 http://127.0.0.1:5000/price/
+    GET: curl http://127.0.0.1:5000/price/
 
     Returns:
         str: json dict with 'data' key
